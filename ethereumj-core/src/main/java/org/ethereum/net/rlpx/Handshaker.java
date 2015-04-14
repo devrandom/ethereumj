@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import org.ethereum.crypto.ECIESCoder;
 import org.ethereum.crypto.ECKey;
 import org.ethereum.net.client.Capability;
+import org.ethereum.net.message.ReasonCode;
+import org.ethereum.net.p2p.DisconnectMessage;
+import org.ethereum.net.p2p.PingMessage;
 import org.spongycastle.crypto.digests.SHA3Digest;
 import org.spongycastle.math.ec.ECPoint;
 import org.spongycastle.util.encoders.Hex;
@@ -74,6 +77,9 @@ public class Handshaker {
         if (!Arrays.equals(remoteId, conn.getHandshakeMessage().nodeId))
             throw new IOException("returns node ID doesn't match the node ID we dialed to");
         System.out.println(conn.getHandshakeMessage().caps);
+        conn.writeMessage(new PingMessage());
+        conn.writeMessage(new DisconnectMessage(ReasonCode.PEER_QUITING));
+        conn.handleNextMessage();
     }
 
     private void delay(int millis) {
